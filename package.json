@@ -1,0 +1,26 @@
+{
+  "name": "tiny-lru-cache",
+  "version": "0.0.0",
+  "description": "Simple LRU cache. put and get.",
+  "author": {
+    "name": "Andy Hume",
+    "email": "andyhume@gmail.com"
+  },
+  "repository": "https://github.com/ahume/tiny-lru-cache",
+  "license": "MIT",
+  "files": [
+    "index.js"
+  ],
+  "keywords": [
+    "tiny-lru-cache",
+    "lru",
+    "cache"
+  ],
+  "devDependencies": {
+    "mocha": "^2.2.1",
+    "jshint": "^2.6.0"
+  },
+  "scripts": {
+    "test": "node_modules/mocha/bin/mocha; node_modules/jshint/bin/jshint index.js test/test.js"
+  }
+}
