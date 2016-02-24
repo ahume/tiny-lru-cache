@@ -2,13 +2,13 @@
 
 > Simple LRU cache. put and get.
 
+Suitable for use in browsers and Node.js.
 
 ## Install
 
 ```sh
 $ npm install --save tiny-lru-cache
 ```
-
 
 ## Usage
 
@@ -19,11 +19,13 @@ var maxSize = 100;
 var cache = new LRUCache(maxSize);
 cache.put('key', 'value');
 cache.get('key'); // returns 'value'
+
+cache.flush(); // Empties the cache
 ```
 
 ### LRU Eviction Policy
 
-Once the cache reaches its maximum size, the least recently used (LRU) item is removed.
+Once the cache reaches its maximum size, the least recently used (LRU) item is evicted.
 
 ## Development
 
@@ -34,8 +36,7 @@ npm test
 
 ## License
 
-MIT © [Andy Hume](2015)
-
+MIT © [Andy Hume](2016)
 
 [npm-image]: https://badge.fury.io/js/tiny-lru-cache.svg
 [npm-url]: https://npmjs.org/package/tiny-lru-cache

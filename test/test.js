@@ -10,6 +10,13 @@ describe('LRUCache', function () {
         assert.equal(cache.get('a'), '1');
     });
 
+    it('should return cached value multiple times', function () {
+        var cache = new LRUCache(2);
+        cache.put('a', '1');
+        assert.equal(cache.get('a'), '1');
+        assert.equal(cache.get('a'), '1');
+    });
+
     it('should not keep more than maxItems', function () {
         var cache = new LRUCache(2);
         cache.put('a', '1');
@@ -41,7 +48,7 @@ describe('LRUCache', function () {
         assert.equal(cache.get('d'), '4');
     });
 
-    it('should empty cache on clear', function () {
+    it('should empty cache on flush', function () {
         var cache = new LRUCache(2);
         cache.put('a', '1');
         cache.put('b', '2');
