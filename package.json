@@ -1,6 +1,6 @@
 {
   "name": "tiny-lru-cache",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Simple LRU cache. put and get.",
   "author": {
     "name": "Andy Hume",

@@ -9,104 +9,101 @@ function LRUCache(maxSize) {
 	this.maxSize = maxSize;
 }
 
-LRUCache.prototype = {
+LRUCache.prototype.put = function (key, value) {
 
-	put: function (key, value) {
+    var spareNode;
+    var existingNode = this.cache[key];
 
-		var spareNode;
-		var existingNode = this.cache[key];
+    // If this is a new key, check the cache size and prune if neccessary.
+    if (!existingNode && this.cacheSize >= this.maxSize) {
+        spareNode = this._removeFromRecencyList(this.tail);
+        delete this.cache[spareNode.key];
+    }
 
-		// If this is a new key, check the cache size and prune if neccessary.
-		if (!existingNode && this.cacheSize >= this.maxSize) {
-			spareNode = this._removeFromRecencyList(this.tail);
-			delete this.cache[spareNode.key];
-		}
+    // If there is an existing node for this key, remove it.
+    if (existingNode) {
+        spareNode = this._removeFromRecencyList(existingNode);
+    }
 
-		// If there is an existing node for this key, remove it.
-		if (existingNode) {
-			spareNode = this._removeFromRecencyList(existingNode);
-		}
+    // Get new node, optional re-using any that were removed above.
+    var newNode = this._makeCacheNode({
+        key: key,
+        value: value
+    }, spareNode);
 
-		// Get new node, optional re-using any that were removed above.
-		var newNode = this._makeCacheNode({
-			key: key,
-			value: value
-		}, spareNode);
+    this._addToRecencyListHead(newNode);
+    this.cache[key] = newNode;
+};
 
-		this._addToRecencyListHead(newNode);
-		this.cache[key] = newNode;
-	},
+LRUCache.prototype.get = function (key) {
+    var node = this.cache[key];
+    if (!node) {
+        return null;
+    }
 
-	get: function (key) {
-		var node = this.cache[key];
-		if (!node) {
-			return null;
-		}
+    this._removeFromRecencyList(node);
+    this._addToRecencyListHead(node);
+    return node.value;
+};
 
-		this._removeFromRecencyList(node);
-		this._addToRecencyListHead(node);
-		return node.value;
-	},
+LRUCache.prototype.flush = function () {
+    this._setup();
+};
 
-	flush: function () {
-		this._setup();
-	},
+LRUCache.prototype._setup = function () {
+    this.cache = Object.create(null);
+    this.head = null;
+    this.tail = null;
+    this.cacheSize = 0; // Because we can't query cache size in O(1)
+};
 
-	_setup: function () {
-		this.cache = Object.create(null);
-		this.head = null;
-		this.tail = null;
-		this.cacheSize = 0; // Because we can't query cache size in O(1)
-	},
+LRUCache.prototype._removeFromRecencyList = function (node) {
+    var previous = node.previous;
+    var next = node.next;
 
-	_removeFromRecencyList: function (node) {
-		var previous = node.previous;
-		var next = node.next;
+    // Pull the node out of the list. previous -> next, next -> previous.
+    // If any is missing it must be head or tail node.
+    if (previous) {
+        previous.next = next;
+    } else {
+        this.head = next;
+    }
+    if (next) {
+        next.previous = previous;
+    } else {
+        this.tail = previous;
+    }
 
-		// Pull the node out of the list. previous -> next, next -> previous.
-		// If any is missing it must be head or tail node.
-		if (previous) {
-			previous.next = next;
-		} else {
-			this.head = next;
-		}
-		if (next) {
-			next.previous = previous;
-		} else {
-			this.tail = previous;
-		}
+    this.cacheSize = this.cacheSize - 1;
 
-		this.cacheSize = this.cacheSize - 1;
+    // Return this so it can be re-used.
+    node.previous = null;
+    node.next = null;
+    return node;
+};
 
-		// Return this so it can be re-used.
-		node.previous = null;
-		node.next = null;
-		return node;
-	},
+LRUCache.prototype._addToRecencyListHead = function (node) {
+    node.next = this.head;
+    node.previous = null;
 
-	_addToRecencyListHead: function (node) {
-		node.next = this.head;
-		node.previous = null;
+    // If there is a head already it's now going to have a previous.
+    if (this.head) {
+        this.head.previous = node;
+    } else {
+        // If there's no head, there's no tail either.
+        this.tail = node;
+    }
 
-		// If there is a head already it's now going to have a previous.
-		if (this.head) {
-			this.head.previous = node;
-		} else {
-			// If there's no head, there's no tail either.
-			this.tail = node;
-		}
+    // This node becomes head
+    this.head = node;
+    this.cacheSize = this.cacheSize + 1;
+};
 
-		// This node becomes head
-		this.head = node;
-		this.cacheSize = this.cacheSize + 1;
-	},
-
-	_makeCacheNode: function (opts, spareNode) {
-		var newNode = spareNode || {};
-		newNode.key = opts.key;
-		newNode.value = opts.value;
-		return newNode;
-	}
+LRUCache.prototype._makeCacheNode = function (opts, spareNode) {
+    var newNode = spareNode || {};
+    newNode.key = opts.key;
+    newNode.value = opts.value;
+    return newNode;
 };
 
 module.exports = LRUCache;
